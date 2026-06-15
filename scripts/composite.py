@@ -53,12 +53,16 @@ def build_scene(scene, cfg, work, tmp):
     """Renderiza una escena normalizada (1920x1080, 30fps, aac) a scene_<id>.mp4."""
     sid = scene["id"]
     mode = scene["mode"]
-    avatar = os.path.join(work, "clips", f"avatar_{sid}.mp4")
+    clip_id = scene.get("clip", sid)             # clip de origen (permite compartir un clip entre escenas)
+    clip_in = float(scene.get("clip_in", 0))     # recorte: segundos a saltar al inicio del clip
+    avatar = os.path.join(work, "clips", f"avatar_{clip_id}.mp4")
     bg = os.path.join(work, BGDIR, f"{sid}.mp4")
     out = scene_path(tmp, sid)
     if not os.path.exists(avatar):
         raise SystemExit(f"Falta clip de avatar: {avatar}")
-    dur = ffprobe_dur(avatar)
+    dur = float(scene.get("duration") or ffprobe_dur(avatar))
+    # input del avatar con recorte opcional (-ss antes de -i = seek rapido)
+    av_in = (["-ss", f"{clip_in:.3f}"] if clip_in > 0 else []) + ["-i", avatar]
 
     cover = f"scale={W}:{H}:force_original_aspect_ratio=increase,crop={W}:{H},setsar=1,fps={FPS}"
     pad = (f"scale={W}:{H}:force_original_aspect_ratio=decrease,"
@@ -68,14 +72,14 @@ def build_scene(scene, cfg, work, tmp):
         # cover = rellena el frame (en vertical hace zoom al centro, look reels);
         # en 16:9 con clip 16:9 equivale a encaje exacto.
         vf = f"[0:v]{cover}[v]"
-        cmd = ["ffmpeg", "-y", "-i", avatar,
-               "-filter_complex", vf, "-map", "[v]", "-map", "0:a?"]
+        cmd = ["ffmpeg", "-y"] + av_in + \
+              ["-filter_complex", vf, "-map", "[v]", "-map", "0:a?", "-t", f"{dur:.3f}"]
 
     elif mode == "bg_only":
         if not os.path.exists(bg):
             raise SystemExit(f"Falta fondo para escena {sid}: {bg}")
         vf = f"[1:v]{cover},trim=duration={dur:.3f},setpts=PTS-STARTPTS[v]"
-        cmd = ["ffmpeg", "-y", "-i", avatar, "-stream_loop", "-1", "-i", bg,
+        cmd = ["ffmpeg", "-y"] + av_in + ["-stream_loop", "-1", "-i", bg,
                "-filter_complex", vf, "-map", "[v]", "-map", "0:a?", "-t", f"{dur:.3f}"]
 
     elif mode == "corner":
@@ -109,7 +113,7 @@ def build_scene(scene, cfg, work, tmp):
             f"{chain}[fg];"
             f"[bgv][fg]overlay={ox}:H-h-{m}:format=auto[v]"
         )
-        cmd = ["ffmpeg", "-y", "-i", avatar, "-stream_loop", "-1", "-i", bg,
+        cmd = ["ffmpeg", "-y"] + av_in + ["-stream_loop", "-1", "-i", bg,
                "-filter_complex", vf, "-map", "[v]", "-map", "0:a?", "-t", f"{dur:.3f}"]
     else:
         raise SystemExit(f"Modo desconocido en escena {sid}: {mode}")
@@ -244,9 +248,10 @@ def mix_audio(video, music, events, cfg, out):
               f"amix=inputs={ninputs}:duration=first:normalize=0:dropout_transition=0[mx]")
     fc.append("[mx]alimiter=limit=0.95[aout]")
 
+    dur = ffprobe_dur(video)   # duracion real (robusto ante metadata de stream rara del xfade)
     run(["ffmpeg", "-y"] + inputs + [
         "-filter_complex", ";".join(fc), "-map", "0:v", "-map", "[aout]",
-        "-c:v", "copy", "-c:a", "aac", "-ar", "48000", "-shortest", out])
+        "-c:v", "copy", "-c:a", "aac", "-ar", "48000", "-t", f"{dur:.3f}", out])
 
 def main():
     ap = argparse.ArgumentParser()
