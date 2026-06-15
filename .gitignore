@@ -1,0 +1,20 @@
+# === Secretos / entorno ===
+.env
+.env.local
+*.local
+
+# === Config personal (usa config/avatar.example.json como plantilla) ===
+config/avatar.json
+
+# === Media generada y trabajo por vídeo (clips de avatar, fondos, renders, scrapes…) ===
+output/
+work/
+
+# === Audio de HeyGen (licenciado — no redistribuir; el skill explica cómo descargarlo) ===
+assets/
+
+# === Node / OS ===
+node_modules/
+**/node_modules/
+.DS_Store
+Thumbs.db

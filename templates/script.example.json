@@ -1,0 +1,46 @@
+{
+  "project": "demo",
+  "aspect": "16:9",
+  "width": 1920,
+  "height": 1080,
+  "source": { "type": "script", "url": null },
+  "music_query": "upbeat corporate background, subtle, motivational",
+  "scenes": [
+    {
+      "id": 1,
+      "mode": "fullscreen",
+      "narration": "Hola, soy tu avatar. Hoy te enseno como convertir cualquier web o guion en un video en segundos.",
+      "bg_visual": {
+        "headline": "De una idea a un video",
+        "subline": "Avatar + fondo dinamico + sonido",
+        "style": "title_card"
+      },
+      "transition": "fade",
+      "transition_after_sec": 0.6
+    },
+    {
+      "id": 2,
+      "mode": "corner",
+      "narration": "El contenido que quieras mostrar aparece a pantalla completa, y yo me quedo aqui, abajo a la derecha, comentandolo.",
+      "bg_visual": {
+        "headline": "Tu contenido protagonista",
+        "bullets": ["Webs y articulos", "Capturas y graficos", "Animaciones"],
+        "style": "bullets"
+      },
+      "transition": "slide",
+      "transition_after_sec": 0.5
+    },
+    {
+      "id": 3,
+      "mode": "bg_only",
+      "narration": "Y cuando hace falta foco total, desaparezco y dejo que el contenido hable por si solo.",
+      "bg_visual": {
+        "headline": "Foco total en el mensaje",
+        "subline": "Mi voz sigue guiando",
+        "style": "fullbleed"
+      },
+      "transition": "fade",
+      "transition_after_sec": 0.0
+    }
+  ]
+}

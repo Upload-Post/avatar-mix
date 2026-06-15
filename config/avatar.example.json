@@ -1,0 +1,37 @@
+{
+  "_comment": "Copia este archivo a config/avatar.json y rellena con TU avatar/voz de HeyGen. Descubre los IDs con las tools del MCP: list_avatar_looks y list_voices (o get_current_user). config/avatar.json esta en .gitignore.",
+  "avatar_id": "REEMPLAZA_CON_TU_AVATAR_ID",
+  "avatar_type": "digital_twin",
+  "voice_id": "REEMPLAZA_CON_TU_VOICE_ID",
+  "avatar_name": "Tu Nombre",
+  "engine": "avatar_v",
+  "_engine_note": "Usar SIEMPRE Avatar V (mejor calidad). En create_video_from_avatar: engine={\"type\":\"avatar_v\"}.",
+  "dimensions": { "width": 1920, "height": 1080 },
+  "_corner_note": "Modo esquina = recuadro PiP (webcam) con el fondo propio del avatar. Sin chroma-key.",
+  "corner": {
+    "scale_width_pct": 28,
+    "margin_px": 48,
+    "corner_radius_px": 28,
+    "border_px": 4,
+    "border_color": "white"
+  },
+  "corner_9x16": {
+    "scale_width_pct": 58,
+    "margin_px": 90,
+    "corner_radius_px": 28,
+    "border_px": 4,
+    "border_color": "white",
+    "position": "bottom-center"
+  },
+  "brand": {
+    "bg_color": "#0b0f1a",
+    "accent": "#3ddc97",
+    "text_color": "#ffffff",
+    "font_family": "Inter, system-ui, sans-serif"
+  },
+  "audio": {
+    "music_volume_db": -22,
+    "duck_threshold": 0.05,
+    "duck_ratio": 8
+  }
+}

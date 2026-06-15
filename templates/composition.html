@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<!--
+  Plantilla HyperFrames para el FONDO del video (1920x1080), formato REAL v0.6.x.
+  - Copiar a work/<slug>/hf/index.html y rellenar el array SCENES (uno por escena, en orden).
+  - Cada escena ocupa [start, start+duration). start = offset ACUMULADO de las escenas previas;
+    duration = duracion REAL del clip de avatar de esa escena (medida con ffprobe).
+  - make_bg.py --mode hyperframes renderiza este proyecto y trocea el master por escena.
+  - REGLAS HyperFrames: todo elemento temporizado lleva class="clip" + data-start/duration/track-index;
+    el timeline va paused y registrado en window.__timelines["main"]; nada de Date.now()/random/fetch.
+  - Estilos por escena: "title_card" | "bullets" | "fullbleed".
+-->
+<title>avatar-mix background</title>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+  :root{ --bg:#0b0f1a; --accent:#3ddc97; --text:#fff; --muted:#b8bdc7; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{width:1920px;height:1080px;overflow:hidden;background:var(--bg)}
+  body{font-family:"Inter",system-ui,sans-serif;color:var(--text)}
+  #root{position:relative;width:1920px;height:1080px}
+  .clip{position:absolute}
+  .scene{inset:0;width:1920px;height:1080px;padding:150px;display:flex;
+         flex-direction:column;justify-content:center}
+  .scene.center{align-items:center;justify-content:center;text-align:center;padding:120px}
+  .glow{right:-200px;top:-200px;width:900px;height:900px;border-radius:50%;
+        background:radial-gradient(circle,var(--accent)0%,transparent 60%);opacity:.13}
+  .bar{width:170px;height:16px;border-radius:8px;background:var(--accent);margin-bottom:36px}
+  .headline{font-size:100px;font-weight:800;line-height:1.05;letter-spacing:-2px}
+  .center .headline{font-size:128px}
+  .subline{font-size:50px;color:var(--muted);margin-top:28px}
+  .bullets{margin-top:52px;list-style:none}
+  .bullets li{font-size:52px;font-weight:600;margin:26px 0;padding-left:70px;position:relative}
+  .bullets li::before{content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+        width:36px;height:36px;border-radius:8px;background:var(--accent)}
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="3"
+     data-width="1920" data-height="1080"></div>
+
+<script>
+/* ====== EL SKILL RELLENA ESTE ARRAY ======
+   start/duration en segundos. type = estilo. */
+const SCENES = [
+  { id:1, start:0, duration:5, type:"title_card", headline:"De una idea a un video",
+    subline:"Avatar + fondo dinamico + sonido" },
+  { id:2, start:5, duration:6, type:"bullets", headline:"Tu contenido protagonista",
+    bullets:["Webs y articulos","Capturas y graficos","Animaciones"] },
+  { id:3, start:11, duration:5, type:"fullbleed", headline:"Foco total en el mensaje",
+    subline:"Mi voz sigue guiando" }
+];
+/* ========================================= */
+
+const root = document.getElementById("root");
+const total = SCENES.reduce((m,s)=>Math.max(m,s.start+s.duration),0);
+root.dataset.duration = total;
+
+window.__timelines = window.__timelines || {};
+const master = gsap.timeline({ paused:true });
+
+SCENES.forEach(s=>{
+  const center = s.type==="fullbleed";
+  const sc = document.createElement("div");
+  sc.className = "clip scene" + (center?" center":"");
+  sc.dataset.start = s.start; sc.dataset.duration = s.duration; sc.dataset.trackIndex = 0;
+
+  const glow = document.createElement("div"); glow.className="glow"; sc.appendChild(glow);
+  if(!center){ const bar=document.createElement("div"); bar.className="bar"; sc.appendChild(bar); }
+
+  const ids = {};
+  if(s.headline){ const h=document.createElement("div"); h.className="headline";
+    h.id="hl"+s.id; h.textContent=s.headline; sc.appendChild(h); ids.h=h.id; }
+  if(s.subline){ const p=document.createElement("div"); p.className="subline";
+    p.textContent=s.subline; sc.appendChild(p); }
+  const lis=[];
+  if(s.bullets&&s.bullets.length){ const ul=document.createElement("ul"); ul.className="bullets";
+    s.bullets.forEach((b,i)=>{const li=document.createElement("li");li.id="b"+s.id+"_"+i;
+      li.textContent=b;ul.appendChild(li);lis.push(li.id);}); sc.appendChild(ul); }
+  root.appendChild(sc);
+
+  // Animacion seekable colocada en la ventana temporal de la escena.
+  if(ids.h) master.from("#"+ids.h,{opacity:0,y:40,duration:.6,ease:"power2.out"}, s.start);
+  lis.forEach((id,i)=> master.from("#"+id,{opacity:0,x:-40,duration:.4,ease:"power2.out"},
+                                   s.start+0.3+i*0.18));
+});
+
+window.__timelines["main"] = master;
+</script>
+</body>
+</html>
