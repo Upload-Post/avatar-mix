@@ -116,6 +116,11 @@ flowchart LR
 
 Brand look: background `#0b0f1a`, accent `#3ddc97`, drifting glows, animated entrances, subtle pan/zoom.
 
+> **Always-fresh registry:** on every HyperFrames render the skill auto-pulls the latest animations
+> from the HyperFrames registry (`scripts/sync_animations.py`), so newly released ones (e.g. the 9
+> code animations — `code-typing`, `code-diff`, `code-morph`, `code-particle-assemble`…) are
+> available as `compositions/*.html` with no manual step. Great for **code / dev explainer** videos.
+
 ---
 
 ## 🗂️ Architecture
@@ -129,6 +134,7 @@ avatar-mix/
 │   └── script.example.json              # script schema
 ├── scripts/
 │   ├── make_bg.py        # backgrounds: --mode hyperframes | card · --aspect 16:9|9:16
+│   ├── sync_animations.py # pull latest HyperFrames animations from the registry each run
 │   ├── composite.py      # FFmpeg edit: 3 modes + xfade + audio (music+SFX+ducking)
 │   ├── make_captions.py  # build Hormozi captions composition (transparent HyperFrames)
 │   ├── burn_captions.py  # render + overlay captions → clean _subs.mp4

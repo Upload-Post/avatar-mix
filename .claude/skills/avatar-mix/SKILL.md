@@ -80,6 +80,15 @@ Componentes custom que funcionan muy bien (autorízalos en `work/<slug>/hf/index
 
 Modo rápido sin gráficos ricos: `--mode card` (tarjetas PIL responsivas).
 
+**Registro siempre al día:** en cada render de HyperFrames el skill **sincroniza las animaciones
+nuevas** del registro (`scripts/sync_animations.py`, lo llama `make_bg.py` una vez por proyecto vía
+marcador `.animations_synced`). Así las animaciones que vaya publicando HeyGen (p. ej. las 9 de
+código: `code-typing`, `code-diff`, `code-highlight`, `code-morph`, `code-particle-assemble`…)
+aparecen disponibles en `compositions/` sin tocar nada. Manual: `python3 scripts/sync_animations.py
+--hf work/<slug>/hf` (o `--all` para todo el registro; `HF_NO_SYNC=1` lo desactiva). Úsalas vía
+`data-composition-src="compositions/<nombre>.html"`. Ideal para vídeos **code/dev explainer**
+(avatar en `corner` + animación de código de fondo).
+
 Flujo HyperFrames (v0.6.98, requiere Chrome — validado):
   1. **Dos proyectos** por formato: `work/<slug>/hf/` (16:9, root 1920x1080) y
      `work/<slug>/hf_9x16/` (vertical, root 1080x1920). `make_bg.py` elige por `--aspect`.

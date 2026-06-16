@@ -153,6 +153,12 @@ def render_hyperframes(work, scenes):
     if not os.path.exists(comp):
         raise SystemExit(f"Falta {comp}. Scaffold: `npx hyperframes init hf` dentro de {work} "
                          f"y copia templates/composition.html a hf/index.html con SCENES inyectado.")
+    # Traer SIEMPRE lo último del registro (animaciones nuevas) — una vez por proyecto.
+    if os.environ.get("HF_NO_SYNC") != "1" and not os.path.exists(os.path.join(hf, ".animations_synced")):
+        sync = os.path.join(ROOT, "scripts", "sync_animations.py")
+        if os.path.exists(sync):
+            subprocess.run(["python3", sync, "--hf", hf])
+            open(os.path.join(hf, ".animations_synced"), "w").close()
     print("› Renderizando HyperFrames…")
     subprocess.run(["npx", "--yes", f"hyperframes@{HF_VER}", "render"], cwd=hf, check=True)
     cands = glob.glob(os.path.join(hf, "renders", "*.mp4"))
